@@ -1,5 +1,6 @@
 % implementation based on the function here
 % https://github.com/vlfeat/vlfeat/blob/master/toolbox/demo/vl_demo_sift_match.m
+run('vlfeat-0.9.20/toolbox/vl_setup')
 
 Ia = imread('boat1.pgm');
 Ib = imread('boat2.pgm');
