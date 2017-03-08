@@ -8,12 +8,11 @@ Ib = imread('boat2.pgm');
 [fb, db] = vl_sift (single(Ib));
 
 [matches, score] = vl_ubcmatch (da, db);
-
 % getting the best match
 [temp,originalpos] = sort( score, 'descend' );
 sel = originalpos(1:5);
 
-figure(2) ; clf ;
+figure(1) ; clf ;
 imshow(cat(2, Ia, Ib),[]) ;
 
 xa = fa(1,matches(1,sel)) ; %matches(1,:)
@@ -28,4 +27,13 @@ set(h,'linewidth', 1, 'color', 'b') ;
 vl_plotframe(fa(:,matches(1,sel))) ;
 fb(1,:) = fb(1,:) + size(Ia,2) ;
 vl_plotframe(fb(:,matches(2,sel))) ;
+
 axis image off ;
+
+T = zeros(4,size(matches,2));
+for i=1:size(matches,2)
+T(1:2,i) = fa(1:2,matches(1,i));
+T(3:4,i) = fb(1:2,matches(2,i));
+end
+
+[m, t] = ransac(100, 20, T);
