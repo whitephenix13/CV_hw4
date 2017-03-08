@@ -37,3 +37,11 @@ T(3:4,i) = fb(1:2,matches(2,i));
 end
 
 [m, t] = ransac(100, 20, T);
+% TODO m has to be transposed in a
+a = [m;t'];
+result = [a';0,0,1]';
+
+
+figure(2)
+t_image = transform_image(Ia, m, t);
+imshow(t_image,[]);

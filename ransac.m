@@ -24,7 +24,7 @@ for i=1:N
         b(2*j,1) = T(4,picked_index(j));
     end
     x = pinv(A)*b;
-    m_mat = reshape(x(1:4),[2 2])';
+    m_mat = reshape(x(1:4),[2 2]);
     t_mat = x(5:6);
     transform_T = zeros(2,size(T,2));
     for k=1:size(T,2)
@@ -43,8 +43,8 @@ for i=1:N
     end
     if(count > best_count)
         best_count = count;
-        best_m_mat = reshape(x(1:4), [2 2])';
-        best_t_mat = x(5:6);
+        best_m_mat = m_mat;
+        best_t_mat = t_mat;
     end
 end
 end
