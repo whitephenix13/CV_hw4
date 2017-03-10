@@ -13,7 +13,6 @@ if(strcmp(test,'image_alignment'))
     % getting the best match
     [temp,originalpos] = sort( score, 'descend' );
     sel = originalpos(1:10);
-    
     figure(1) ; clf ;
     imshow(cat(2, Ia, Ib),[]) ;
 
@@ -40,7 +39,6 @@ if(strcmp(test,'image_alignment'))
 
     figure(2)
     [m, t] = ransac(100, 20, T);
-    % TODO m has to be transposed in a
     a = [m';t'];
     result = [a';0,0,1]';
     trans = maketform('affine',result);
@@ -48,7 +46,7 @@ if(strcmp(test,'image_alignment'))
     imshow(newIa,[]);
     title('Built in matlab');
     figure(3)
-    t_image = transform_image(Ia, m', t);
+    [t_image,test, global_shift] = transform_image(Ia, m, t);
     imshow(t_image,[]);
     title('custom image transform');
 elseif(strcmp(test,'image_stitching'))
@@ -56,18 +54,21 @@ elseif(strcmp(test,'image_stitching'))
     Imb = imread('left.jpg');
     Ia = rgb2gray(Ima);
     Ib = rgb2gray(Imb);
+    % zero pad Ia and Ib
+    [Xa, Ya] = size(Ia);
+    [Xb, Yb] = size(Ib);
+    padX = Xb - Xa;
+    padY = Yb - Ya;
+    Ia = padarray(Ia, [padX padY], 'post');
     [fa, da] = vl_sift (single(Ia));
     [fb, db] = vl_sift (single(Ib));
     
     [matches, score] = vl_ubcmatch (da, db);
     [temp,originalpos] = sort( score, 'descend' );
-    sel = originalpos(1:5);
+    sel = originalpos(1:15);
 
     figure(1) ; clf ;
-    subplot(1,2,1);
-    imshow(Ia,[]);
-    subplot(1,2,2);
-    imshow(Ib,[]);
+    imshow(cat(2, Ia, Ib),[]) ;
 
     xa = fa(1,matches(1,sel)) ; %matches(1,:)
     xb = fb(1,matches(2,sel)) + size(Ia,2) ; %matches(2,:)
@@ -92,6 +93,13 @@ elseif(strcmp(test,'image_stitching'))
     end
     figure(2)
     [m, t] = ransac(100, 20, T);
-    t_image = transform_image(Ia, m', t);
-    imshow(t_image,[]) ;
+    [image_1_1,t_image, global_shift] = transform_image(Ia, m, t);
+    new_imageB = padarray(Ib, [size(t_image,1) - size(Ib,1), size(t_image,2) - size(Ib,2)], 'post');
+    new_imageFinal = max(t_image, double(new_imageB));
+    %shows the stitched images
+    imshow(new_imageFinal,[]);
+    %shows the transformed image only
+    %imshow(image_1_1,[]);
+    
+    
 end
