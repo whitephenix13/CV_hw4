@@ -12,7 +12,7 @@ if(strcmp(test,'image_alignment'))
     [matches, score] = vl_ubcmatch (da, db);
     % getting the best match
     [temp,originalpos] = sort( score, 'descend' );
-    sel = originalpos(1:5);
+    sel = originalpos(1:10);
 
     figure(1) ; clf ;
     imshow(cat(2, Ia, Ib),[]) ;
@@ -55,6 +55,12 @@ elseif(strcmp(test,'image_stitching'))
     Imb = imread('left.jpg');
     Ia = rgb2gray(Ima);
     Ib = rgb2gray(Imb);
+    % zero pad Ia and Ib
+    [Xa, Ya] = size(Ia);
+    [Xb, Yb] = size(Ib);
+    padX = Xb - Xa;
+    padY = Yb - Ya;
+    Ia = padarray(Ia, [padX padY], 'post');
     [fa, da] = vl_sift (single(Ia));
     [fb, db] = vl_sift (single(Ib));
     
@@ -63,10 +69,7 @@ elseif(strcmp(test,'image_stitching'))
     sel = originalpos(1:5);
 
     figure(1) ; clf ;
-    subplot(1,2,1);
-    imshow(Ia,[]);
-    subplot(1,2,2);
-    imshow(Ib,[]);
+    imshow(cat(2, Ia, Ib),[]) ;
 
     xa = fa(1,matches(1,sel)) ; %matches(1,:)
     xb = fb(1,matches(2,sel)) + size(Ia,2) ; %matches(2,:)
