@@ -2,7 +2,7 @@
 % https://github.com/vlfeat/vlfeat/blob/master/toolbox/demo/vl_demo_sift_match.m
 run('vlfeat-0.9.20/toolbox/vl_setup')
 
-test = 'image_stitching' % image_alignment image_stitching
+test = 'image_stitching'; % image_alignment image_stitching
 if(strcmp(test,'image_alignment'))
     Ia = imread('boat1.pgm');
     Ib = imread('boat2.pgm');
@@ -13,7 +13,6 @@ if(strcmp(test,'image_alignment'))
     % getting the best match
     [temp,originalpos] = sort( score, 'descend' );
     sel = originalpos(1:10);
-
     figure(1) ; clf ;
     imshow(cat(2, Ia, Ib),[]) ;
 
@@ -41,15 +40,16 @@ if(strcmp(test,'image_alignment'))
     figure(2)
     [m, t] = ransac(100, 20, T);
     % TODO m has to be transposed in a
-    a = [m;t'];
+    a = [m';t'];
     result = [a';0,0,1]';
     trans = maketform('affine',result);
     newIa = imtransform(Ia,trans);
     imshow(newIa,[]);
-
+    title('Built in matlab');
     figure(3)
-    t_image = transform_image(Ia, m, t);
+    [t_image, global_shift] = transform_image(Ia, m', t);
     imshow(t_image,[]);
+    title('custom image transform');
 elseif(strcmp(test,'image_stitching'))
     Ima = imread('right.jpg');
     Imb = imread('left.jpg');
@@ -66,7 +66,7 @@ elseif(strcmp(test,'image_stitching'))
     
     [matches, score] = vl_ubcmatch (da, db);
     [temp,originalpos] = sort( score, 'descend' );
-    sel = originalpos(1:5);
+    sel = originalpos(1:15);
 
     figure(1) ; clf ;
     imshow(cat(2, Ia, Ib),[]) ;
@@ -87,12 +87,16 @@ elseif(strcmp(test,'image_stitching'))
     axis image off ;
     
     T = zeros(4,size(matches,2));
+    %get (x,y,x',y') coordinate of matching point and store them in T 
     for i=1:size(matches,2)
         T(1:2,i) = fa(1:2,matches(1,i));
         T(3:4,i) = fb(1:2,matches(2,i));
     end
     figure(2)
     [m, t] = ransac(100, 20, T);
-    t_image = transform_image(Ia, m, t);
-    imshow(t_image,[]) ;
+    [t_image, global_shift] = transform_image(Ia, m', t);
+    new_imageA = padarray(t_image, [global_shift(2), global_shift(1)], 'pre');
+    new_imageB = padarray(Ib, [size(new_imageA,1) - size(Ib,1), size(new_imageA,2) - size(Ib,2)], 'post');
+    new_imageFinal = max(new_imageA, double(new_imageB));
+    imshow(new_imageFinal,[]);
 end

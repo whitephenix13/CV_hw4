@@ -1,5 +1,6 @@
-function [transformed_image] = transform_image(image, m, t)
+function [transformed_image, global_shift] = transform_image(image, m, t)
 % estimate transformed image size by looking at how coners are tranformed
+global_shift = zeros(2,1);
 [imX, imY] = size(image);
 TL_corner = [1,1];
 TR_corner = [size(image,1),1];
@@ -20,6 +21,7 @@ y_size = round(max(ys)) - round(min(ys));
 % we assume that the point which transform is (min(xs),min(ys)) will now be
 % (1,1) hence we have a global transformation of (min(xs)-1,min(ys)-1)
 global_shift = [round(min(xs)-1);round(min(ys)-1)];
+global_shift
 
 transformed_image = zeros(x_size,y_size);
 for x=1:x_size
