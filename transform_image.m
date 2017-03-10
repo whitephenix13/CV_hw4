@@ -1,4 +1,4 @@
-function [transformed_image] = transform_image(image, m, t)
+function [transformed_image,global_shift] = transform_image(image, m, t)
 % estimate transformed image size by looking at how coners are tranformed
 [imX, imY] = size(image);
 TL_corner = [1,1];
@@ -34,4 +34,5 @@ for x=1:x_size
         end
     end
 end
+
 end
