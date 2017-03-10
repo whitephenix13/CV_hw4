@@ -11,7 +11,7 @@ Ib = imread('boat2.pgm');
 
 % getting the best match
 [temp,originalpos] = sort( score, 'descend' );
-sel = originalpos(1:5);
+sel = originalpos(1:10);
 
 figure(2) ; clf ;
 imshow(cat(2, Ia, Ib),[]) ;
